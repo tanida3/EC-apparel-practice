@@ -1,9 +1,9 @@
 import { Suspense } from 'react';
 import { getProducts } from '@/lib/supabase/products';
-import { ProductGrid } from '@/src/app/product/product-grid';
+import { ProductGrid } from './components/product/product-grid';
 import { ProductGridSkeleton } from './components/ui/skeleton';
 import { ErrorState } from './components/ui/error-state';
-import { CategoryFilter } from '@/src/app/product/category-filter';
+import { CategoryFilter } from './components/product/category-filter';
 import { SITE_DESCRIPTION } from './lib/constants';
 
 type Props = {
