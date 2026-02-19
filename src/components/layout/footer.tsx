@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { SITE_NAME } from '@/src/app/lib/constants';
+import { SITE_NAME } from '@/lib/constants';
 
 export function Footer() {
   const pathname = usePathname();

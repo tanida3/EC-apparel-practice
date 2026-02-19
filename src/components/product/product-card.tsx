@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { StockBadge } from './stock-badge';
-import type { Product } from '../types';
+import type { Product } from '@/types';
 
 type ProductCardProps = {
   product: Product;

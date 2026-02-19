@@ -1,6 +1,6 @@
 import { ProductCard } from './product-card';
-import { EmptyState } from '../components/ui/empty-state';
-import type { Product } from '../types';
+import { EmptyState } from '@/components/ui/empty-state';
+import type { Product } from '@/types';
 
 type ProductGridProps = {
   products: Product[];

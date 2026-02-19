@@ -1,6 +1,6 @@
 'use client';
 
-import { Toast as ToastType } from '@/src/hooks/use-toast';
+import { Toast as ToastType } from '@/hooks/use-toast';
 
 type ToastContainerProps = {
   toasts: ToastType[];

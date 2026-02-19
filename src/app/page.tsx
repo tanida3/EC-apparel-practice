@@ -1,10 +1,10 @@
 import { Suspense } from 'react';
 import { getProducts } from '@/lib/supabase/products';
-import { ProductGrid } from './components/product/product-grid';
-import { ProductGridSkeleton } from './components/ui/skeleton';
-import { ErrorState } from './components/ui/error-state';
-import { CategoryFilter } from './components/product/category-filter';
-import { SITE_DESCRIPTION } from './lib/constants';
+import { ProductGrid } from '@/components/product/product-grid';
+import { ProductGridSkeleton } from '@/components/ui/skeleton';
+import { ErrorState } from '@/components/ui/error-state';
+import { CategoryFilter } from '@/components/product/category-filter';
+import { SITE_DESCRIPTION } from '@/lib/constants';
 
 type Props = {
   searchParams: Promise<{ category?: string }>;
