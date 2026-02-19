@@ -1,6 +1,6 @@
-import { Badge } from '../components/ui/badge';
-import { STOCK_STATUS_LABELS } from '@/src/app/lib/constants';
-import type { StockStatus } from '../types';
+import { Badge } from '@/components/ui/badge';
+import { STOCK_STATUS_LABELS } from '@/lib/constants';
+import type { StockStatus } from '@/types';
 
 type StockBadgeProps = {
   status: StockStatus;

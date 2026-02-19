@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { CATEGORIES } from '../lib/constants';
+import { CATEGORIES } from '@/lib/constants';
 
 type CategoryFilterProps = {
   currentCategory?: string;
