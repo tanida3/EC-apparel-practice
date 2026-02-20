@@ -1,111 +1,34 @@
-'use client';
+import { notFound } from 'next/navigation';
+import { getProduct } from '@/lib/supabase/products';
+import { ProductDetailClient } from './product-detail-client';
+import type { Metadata } from 'next';
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { ProductGallery } from '@/components/product/product-gallery';
-import { SizeSelector } from '@/components/product/size-selector';
-import { ColorSelector } from '@/components/product/color-selector';
-import { StockBadge } from '@/components/product/stock-badge';
-import { Button } from '@/components/ui/button';
-import type { Product } from '@/types';
-
-type ProductDetailClientProps = {
-  product: Product;
+type Props = {
+  params: Promise<{ id: string }>;
 };
 
-export function ProductDetailClient({ product }: ProductDetailClientProps) {
-  const [selectedSize, setSelectedSize] = useState<string | null>(null);
-  const [selectedColor, setSelectedColor] = useState<string | null>(null);
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  const product = await getProduct(id);
+  if (!product) return { title: '商品が見つかりません' };
 
-  const formattedPrice = new Intl.NumberFormat('ja-JP', {
-    style: 'currency',
-    currency: 'JPY',
-  }).format(product.price);
+  return {
+    title: `${product.name} - ${product.brand}`,
+    description: product.description || `${product.brand}の${product.name}`,
+  };
+}
 
-  const isOutOfStock = product.stock_status === 'out_of_stock';
+export default async function ProductDetailPage({ params }: Props) {
+  const { id } = await params;
+  const product = await getProduct(id);
+
+  if (!product) {
+    notFound();
+  }
 
   return (
-    <>
-      {/* パンくず */}
-      <nav className="mb-6 text-sm text-[#6B7280]">
-        <Link href="/" className="hover:text-[#1A1A1A] transition-colors">
-          トップ
-        </Link>
-        <span className="mx-2">/</span>
-        <span className="text-[#1A1A1A]">{product.name}</span>
-      </nav>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-        {/* 画像ギャラリー */}
-        <ProductGallery
-          mainImage={product.image_url}
-          subImages={product.sub_image_urls}
-          productName={product.name}
-        />
-
-        {/* 商品情報 */}
-        <div className="space-y-6">
-          {/* ブランド・商品名 */}
-          <div>
-            <p className="text-sm text-[#6B7280] uppercase tracking-wider mb-1">
-              {product.brand}
-            </p>
-            <h1 className="text-2xl font-bold text-[#1A1A1A]">{product.name}</h1>
-          </div>
-
-          {/* 価格 + 在庫 */}
-          <div className="flex items-center gap-4">
-            <p className="text-2xl font-bold text-[#1A1A1A]">{formattedPrice}</p>
-            <StockBadge status={product.stock_status} />
-          </div>
-
-          {/* 区切り線 */}
-          <hr className="border-[#E5E7EB]" />
-
-          {/* カラー選択 */}
-          <ColorSelector
-            colors={product.colors}
-            selectedColor={selectedColor}
-            onSelect={setSelectedColor}
-            disabled={isOutOfStock}
-          />
-
-          {/* サイズ選択 */}
-          <SizeSelector
-            sizes={product.sizes}
-            selectedSize={selectedSize}
-            onSelect={setSelectedSize}
-            disabled={isOutOfStock}
-          />
-
-          {/* カートボタン（デモ） */}
-          <Button
-            variant="secondary"
-            size="lg"
-            className="w-full"
-            disabled={isOutOfStock || (!selectedSize && product.sizes.length > 0)}
-          >
-            {isOutOfStock
-              ? '在庫なし'
-              : !selectedSize && product.sizes.length > 0
-                ? 'サイズを選択してください'
-                : 'カートに追加'}
-          </Button>
-
-          {/* 商品説明 */}
-          {product.description && (
-            <div>
-              <h2 className="text-sm font-semibold text-[#1A1A1A] mb-2">商品説明</h2>
-              <p className="text-sm text-[#6B7280] leading-relaxed">{product.description}</p>
-            </div>
-          )}
-
-          {/* カテゴリ情報 */}
-          <div className="text-xs text-[#9CA3AF]">
-            <p>カテゴリ: {product.category}</p>
-          </div>
-        </div>
-      </div>
-    </>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+      <ProductDetailClient product={product} />
+    </div>
   );
 }
