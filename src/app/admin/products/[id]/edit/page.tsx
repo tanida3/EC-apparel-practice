@@ -1,106 +1,43 @@
-import { createClient } from './server';
-import { DUMMY_PRODUCTS } from '@/lib/dummy-data';
-import type { Product, ProductFormData } from '@/types';
+import { notFound } from 'next/navigation';
+import Link from 'next/link';
+import { getProduct } from '@/lib/supabase/products';
+import { ProductForm } from '@/components/admin/product-form';
+import type { Metadata } from 'next';
 
-const isSupabaseConfigured =
-  process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://placeholder.supabase.co' &&
-  process.env.NEXT_PUBLIC_SUPABASE_URL !== undefined;
+type Props = {
+  params: Promise<{ id: string }>;
+};
 
-export async function getProducts(category?: string): Promise<Product[]> {
-  if (!isSupabaseConfigured) {
-    const products = DUMMY_PRODUCTS.filter((p) => p.is_published);
-    if (category && category !== 'すべて') {
-      return products.filter((p) => p.category === category);
-    }
-    return products;
-  }
-
-  const supabase = await createClient();
-  let query = supabase
-    .from('products')
-    .select('*')
-    .eq('is_published', true)
-    .order('created_at', { ascending: false });
-
-  if (category && category !== 'すべて') {
-    query = query.eq('category', category);
-  }
-
-  const { data, error } = await query;
-  if (error) throw new Error(error.message);
-  return data as Product[];
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  const product = await getProduct(id);
+  return {
+    title: product ? `${product.name} を編集` : '商品が見つかりません',
+  };
 }
 
-export async function getAllProducts(): Promise<Product[]> {
-  if (!isSupabaseConfigured) {
-    return DUMMY_PRODUCTS;
+export default async function EditProductPage({ params }: Props) {
+  const { id } = await params;
+  const product = await getProduct(id);
+
+  if (!product) {
+    notFound();
   }
 
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('products')
-    .select('*')
-    .order('created_at', { ascending: false });
+  return (
+    <div>
+      {/* パンくず */}
+      <nav className="mb-6 text-sm text-[#6B7280]">
+        <Link href="/admin/products" className="hover:text-[#1A1A1A] transition-colors">
+          商品管理
+        </Link>
+        <span className="mx-2">/</span>
+        <span className="text-[#1A1A1A]">{product.name} を編集</span>
+      </nav>
 
-  if (error) throw new Error(error.message);
-  return data as Product[];
-}
+      <h1 className="text-2xl font-bold text-[#1A1A1A] mb-8">商品を編集</h1>
 
-export async function getProduct(id: string): Promise<Product | null> {
-  if (!isSupabaseConfigured) {
-    return DUMMY_PRODUCTS.find((p) => p.id === id) ?? null;
-  }
-
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('products')
-    .select('*')
-    .eq('id', id)
-    .single();
-
-  if (error) return null;
-  return data as Product;
-}
-
-export async function createProduct(product: ProductFormData): Promise<Product> {
-  if (!isSupabaseConfigured) {
-    throw new Error('Supabaseが設定されていません。.env.localを確認してください。');
-  }
-
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('products')
-    .insert(product)
-    .select()
-    .single();
-
-  if (error) throw new Error(error.message);
-  return data as Product;
-}
-
-export async function updateProduct(id: string, product: Partial<ProductFormData>): Promise<Product> {
-  if (!isSupabaseConfigured) {
-    throw new Error('Supabaseが設定されていません。.env.localを確認してください。');
-  }
-
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('products')
-    .update({ ...product, updated_at: new Date().toISOString() })
-    .eq('id', id)
-    .select()
-    .single();
-
-  if (error) throw new Error(error.message);
-  return data as Product;
-}
-
-export async function deleteProduct(id: string): Promise<void> {
-  if (!isSupabaseConfigured) {
-    throw new Error('Supabaseが設定されていません。.env.localを確認してください。');
-  }
-
-  const supabase = await createClient();
-  const { error } = await supabase.from('products').delete().eq('id', id);
-  if (error) throw new Error(error.message);
+      <ProductForm mode="edit" product={product} />
+    </div>
+  );
 }
