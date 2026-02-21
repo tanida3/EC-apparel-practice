@@ -1,36 +1,159 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AND STYLE - アパレルEC 商品管理・閲覧UIアプリ
 
-## Getting Started
+> ポートフォリオ用デモアプリケーション
 
-First, run the development server:
+## 1. アプリ概要
+
+アパレルECサイトの「商品管理・閲覧UI」をテーマにしたWebアプリケーションです。
+フロントエンドの商品一覧・詳細画面と、バックオフィスの商品管理（CRUD）画面を実装しています。
+
+### 画面構成
+
+| 画面 | パス | 説明 |
+|------|------|------|
+| 商品一覧 | `/` | カテゴリフィルター付きグリッドレイアウト |
+| 商品詳細 | `/products/[id]` | 画像ギャラリー・サイズ/カラー選択UI |
+| ログイン | `/auth/login` | Supabase Auth によるメール認証 |
+| 新規登録 | `/auth/register` | バリデーション付きフォーム |
+| 商品管理 | `/admin/products` | 商品の一覧・編集・削除 |
+| 商品登録 | `/admin/products/new` | フォームバリデーション付き新規登録 |
+| 商品編集 | `/admin/products/[id]/edit` | 既存商品の編集（フォーム再利用） |
+
+## 2. 作成背景
+
+- ECサイトのUI/UX実装に興味を持ったことがきっかけで制作
+- 日常的にECサイトを利用する中で、「シンプルで商品が見やすいUI」への関心が高まったことがきっかけ
+- 実際に自分で実装することで、UIコンポーネント設計やReact・TypeScriptの技術力を実践的に身につけることを目的とした
+
+
+## 3. 主な機能
+
+### フロントエンド（閲覧）
+- レスポンシブ対応の商品グリッド（2列 → 3列 → 4列）
+- カテゴリによるフィルタリング
+- 商品画像ギャラリー（サムネイルクリックで切替）
+- サイズ選択（ピルボタン式）/ カラー選択（カラースウォッチ式）
+- 在庫状態のバッジ表示（在庫あり / 残りわずか / 在庫なし）
+
+### 管理画面（CRUD）
+- 商品一覧テーブル（画像・ブランド・価格・在庫・公開状態）
+- 商品の新規登録・編集（共通フォームコンポーネント）
+- 削除確認モーダル
+- 成功/失敗のToast通知
+- フォームバリデーション（リアルタイム + submit時）
+
+### 認証
+- Supabase Auth によるメール/パスワード認証
+- ミドルウェアによるルート保護（管理画面は認証必須）
+- ログイン/ログアウト状態のUI連携
+
+### UI状態
+- **Loading**: Skeleton UIによるローディング表現
+- **Error**: リトライ機能付きエラー画面
+- **Empty**: アクション誘導付き空状態表示
+- **404**: カスタム Not Found ページ
+
+## 4. 使用技術と選定理由
+
+| 技術 | 選定理由 |
+|------|---------|
+| **Next.js 15 (App Router)** | Server ComponentsやSuspenseを活用したパフォーマンス最適化が可能 |
+| **React 19** | Server/Client Componentsの使い分けによるパフォーマンスとDXの両立 |
+| **TypeScript** | 型安全性による保守性の向上。コンポーネントのProps定義で意図を明確化 |
+| **Tailwind CSS** | ユーティリティファーストでデザインの一貫性を保ちつつ高速開発。デザインシステムとの親和性が高い |
+| **Supabase** | 認証（Auth）とデータベース（PostgreSQL）をシンプルなAPIで利用可能。RLSによるセキュリティも実現 |
+
+## 5. UI/UXで工夫した点
+
+### デザインシステム
+- **白基調 + 黒のコントラスト**: ECサイトに必要な信頼感とクリーンさを演出
+- **アクセントカラー（#E85D3A）**: 購買行動を促すCTAにのみ使用し、視線誘導を意識
+- **余白の設計**: 商品画像が主役になるよう十分な余白を確保
+- **ホバーエフェクト**: 控えめな`scale(1.02)` + `shadow`で上品な操作フィードバック
+
+### コンポーネント設計
+- **再利用可能なUIコンポーネント**: Button / Input / Select / Badge / Modal / Toast / Skeleton をプリミティブとして設計
+- **Compound Pattern**: ProductForm を `mode` prop で新規/編集を切り替え、コードの重複を排除
+- **状態の明示**: 各画面で Loading / Error / Empty の3状態を必ず実装
+
+### アクセシビリティ
+- `aria-label` / `aria-pressed` による支援技術対応
+- キーボードナビゲーション（Escapeでモーダル閉じる等）
+- フォーカスリングの明示的なスタイリング
+
+## 6. 実務を想定して意識した点
+
+1. **Server Components優先**: データ取得はServer Component、インタラクションのみClient Component。パフォーマンスとSEOを両立
+2. **コンポーネントの責務分離**: UIプリミティブ / 機能コンポーネント / ページコンポーネントの3層構造
+3. **自前バリデーション**: ライブラリに頼らずフォームバリデーションを実装し、仕組みの理解度を示す
+4. **エラーハンドリング**: try-catchによるエラー境界とユーザーフレンドリーなエラーメッセージ
+5. **ミドルウェアによる認証ガード**: 管理画面へのアクセス制御をサーバーサイドで実現
+6. **命名規則の統一**: ファイル名はkebab-case、コンポーネントはPascalCase、関数はcamelCase
+7. **型安全**: TypeScript strict modeで型の恩恵を最大限活用
+8. **Supabase未接続でも動作**: ダミーデータによるフォールバックで、Supabase設定前でも閲覧画面が動作
+
+## 7. 起動方法
+
+### 前提条件
+- Node.js 18以上
+- npm
+
+### 手順
 
 ```bash
+# リポジトリをクローン
+git clone https://github.com/your-username/ec-apparel-practice.git
+cd ec-apparel-practice
+
+# 依存パッケージをインストール
+npm install
+
+# 環境変数を設定
+cp .env.example .env.local
+# .env.local を編集してSupabaseの接続情報を入力
+
+# 開発サーバーを起動
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+ブラウザで http://localhost:3000 を開いてください。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+> **Note**: Supabaseを設定しない場合でもダミーデータで閲覧画面が動作します。
+> 管理画面のCRUD機能を使うにはSupabaseの設定が必要です。
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Supabase セットアップ
 
-## Learn More
+1. [Supabase](https://supabase.com) でプロジェクトを作成
+2. `supabase/schema.sql` をSQL Editorで実行
+3. `supabase/seed.sql` でサンプルデータを投入
+4. `.env.local` にProject URLとanon keyを設定
+5. Authentication > Settings でメール認証を有効化
 
-To learn more about Next.js, take a look at the following resources:
+## 8. 今後の改善点
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- [ ] 商品画像のアップロード機能（Supabase Storage）
+- [ ] 検索機能（商品名・ブランド名での全文検索）
+- [ ] ページネーション / 無限スクロール
+- [ ] お気に入り機能
+- [ ] ダークモード対応
+- [ ] E2Eテスト（Playwright）
+- [ ] Storybook によるコンポーネントカタログ
+- [ ] パフォーマンス最適化（ISR / Image最適化の深掘り）
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## AI利用について
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+このプロジェクトはAI（Claude）を活用して開発しました。
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**AIに任せた部分:**
+- 初期コード生成（ボイラープレート、UIコンポーネント）
+- ダミーデータの作成
+- SQLスキーマのドラフト
+
+**人が設計・判断した部分:**
+- アプリの全体設計・画面構成
+- デザインシステム（カラー、余白、タイポグラフィの決定）
+- コンポーネントの責務分離と命名
+- UI/UXの意思決定（どの状態をどう表現するか）
+- Supabase RLS ポリシーの設計
