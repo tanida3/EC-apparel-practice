@@ -92,6 +92,14 @@
 7. **型安全**: TypeScript strict modeで型の恩恵を最大限活用
 8. **Supabase未接続でも動作**: ダミーデータによるフォールバックで、Supabase設定前でも閲覧画面が動作
 
+## デモ
+        
+URL: https://ecapparel.vercel.app/
+
+テストアカウント（管理画面用）
+- メール: kukemi0520@gmail.com
+- パスワード: test0520
+
 ## 7. 起動方法
 
 ### 前提条件
